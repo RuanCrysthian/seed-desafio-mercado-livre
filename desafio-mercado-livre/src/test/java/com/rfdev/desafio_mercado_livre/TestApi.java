@@ -20,6 +20,7 @@ public abstract class TestApi {
 
     @AfterEach
     void cleanDatabase() {
+        entityManager.createNativeQuery("DELETE FROM categorias").executeUpdate();
         entityManager.createNativeQuery("DELETE FROM usuarios").executeUpdate();
         entityManager.flush();
     }
