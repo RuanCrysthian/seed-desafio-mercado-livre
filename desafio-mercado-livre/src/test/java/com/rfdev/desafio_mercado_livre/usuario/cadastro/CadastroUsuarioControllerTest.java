@@ -43,12 +43,16 @@ public class CadastroUsuarioControllerTest extends TestApi {
                 MockMvcRequestBuilders.post("/api/usuarios")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.login").value("john.doe@email.com"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.criadoEm").exists());
 
         entityManager.flush();
         entityManager.clear();
 
-        Long count = entityManager.createQuery("SELECT COUNT(u) FROM Usuario u WHERE u.login = :login", Long.class)
+        Long count = entityManager
+                .createQuery("SELECT COUNT(u) FROM Usuario u WHERE u.login = :login", Long.class)
                 .setParameter("login", "john.doe@email.com")
                 .getSingleResult();
 
@@ -81,11 +85,13 @@ public class CadastroUsuarioControllerTest extends TestApi {
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(segundoRequest)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens[0]").value("Email já cadastrado."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens[0]")
+                        .value("Email já cadastrado."));
         ;
 
         // Verifica que apenas um usuário foi cadastrado
-        Long count = entityManager.createQuery("SELECT COUNT(u) FROM Usuario u WHERE u.login = :login", Long.class)
+        Long count = entityManager
+                .createQuery("SELECT COUNT(u) FROM Usuario u WHERE u.login = :login", Long.class)
                 .setParameter("login", "duplicado@email.com")
                 .getSingleResult();
 
