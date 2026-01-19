@@ -1,8 +1,8 @@
 package com.rfdev.desafio_mercado_livre.usuario.cadastro;
 
 import org.hibernate.validator.constraints.Length;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.rfdev.desafio_mercado_livre.configuracao.seguranca.PasswordEncoder;
 import com.rfdev.desafio_mercado_livre.configuracao.validacao.CampoUnico;
 import com.rfdev.desafio_mercado_livre.usuario.Usuario;
 
@@ -14,6 +14,7 @@ public record CadastroUsuarioRequest(
         @NotBlank @Length(min = 6, message = "Senha fraca.") String senha) {
 
     public Usuario toModel(PasswordEncoder passwordEncoder) {
-        return new Usuario(this.login, passwordEncoder.encode(this.senha));
+        String senhaCriptografada = passwordEncoder.encode(this.senha);
+        return new Usuario(this.login, senhaCriptografada);
     }
 }

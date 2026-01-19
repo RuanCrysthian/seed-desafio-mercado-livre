@@ -1,12 +1,12 @@
 package com.rfdev.desafio_mercado_livre.usuario.cadastro;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rfdev.desafio_mercado_livre.configuracao.seguranca.PasswordEncoder;
 import com.rfdev.desafio_mercado_livre.usuario.Usuario;
 import com.rfdev.desafio_mercado_livre.usuario.UsuarioRepository;
 
