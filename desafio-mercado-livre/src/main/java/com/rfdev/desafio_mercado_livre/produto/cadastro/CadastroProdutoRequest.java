@@ -29,7 +29,7 @@ public record CadastroProdutoRequest(
             CategoriaRepository categoriaRepository,
             Usuario usarioCriador) {
         Categoria categoria = categoriaRepository.findById(categoriaId).orElseThrow(() -> new IllegalArgumentException(
-                "Categoria não encontrada"));
+                "Categoria não existe"));
         return new Produto(
                 nome,
                 valor,
