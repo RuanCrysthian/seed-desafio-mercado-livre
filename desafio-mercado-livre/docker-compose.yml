@@ -19,11 +19,33 @@ services:
       retries: 5
     networks:
       - desafio-network
+  
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=ROOTNAME
+      - MINIO_ROOT_PASSWORD=CHANGEME123
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - desafio-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
     driver: local
-
+  minio_data:
+    driver: local
 networks:
   desafio-network:
     driver: bridge

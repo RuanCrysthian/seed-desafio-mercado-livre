@@ -3,6 +3,7 @@ package com.rfdev.desafio_mercado_livre.produto;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,6 +77,11 @@ public class Produto {
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Instant criadoEm;
 
+    @ElementCollection
+    @CollectionTable(name = "produto_imagens", joinColumns = @JoinColumn(name = "produto_id"))
+    @Column(name = "imagem")
+    private List<String> imagens;
+
     @Deprecated
     public Produto() {
     }
@@ -96,6 +102,7 @@ public class Produto {
         this.categoria = categoria;
         this.usuarioCriador = usuarioCriador;
         this.criadoEm = Instant.now();
+        this.imagens = new ArrayList<>();
     }
 
     public void abaterEstoque(@PositiveOrZero BigInteger quantidade) {
@@ -113,7 +120,11 @@ public class Produto {
     }
 
     public boolean pertenceAoUsuario(Usuario usuario) {
-        return this.usuarioCriador.equals(usuario);
+        return this.usuarioCriador.getId().equals(usuario.getId());
+    }
+
+    public void adicionarImagens(List<String> urlsImagens) {
+        this.imagens.addAll(urlsImagens);
     }
 
 }
