@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +25,7 @@ import com.rfdev.desafio_mercado_livre.usuario.Usuario;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestController
+@ConditionalOnProperty(name = "app.minio.enabled", havingValue = "true", matchIfMissing = true)
 public class UploadImagemProdutoController {
 
     @Value("${app.minio.url}")
