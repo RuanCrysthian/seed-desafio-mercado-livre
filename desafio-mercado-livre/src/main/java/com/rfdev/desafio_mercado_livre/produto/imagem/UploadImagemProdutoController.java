@@ -56,12 +56,10 @@ public class UploadImagemProdutoController {
             throw new AccessDeniedException("Você não tem permissão para adicionar imagens a este produto");
         }
 
-        // Validações
         if (imagens == null || imagens.isEmpty()) {
             throw new IllegalArgumentException("É necessário enviar pelo menos uma imagem");
         }
 
-        // Valida se há pelo menos um arquivo não vazio
         long arquivosValidos = imagens.stream().filter(arquivo -> !arquivo.isEmpty()).count();
         if (arquivosValidos == 0) {
             throw new IllegalArgumentException("É necessário enviar pelo menos uma imagem válida");
