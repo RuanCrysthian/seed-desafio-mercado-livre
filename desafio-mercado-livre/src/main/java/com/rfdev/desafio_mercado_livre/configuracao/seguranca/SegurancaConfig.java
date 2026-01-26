@@ -33,6 +33,7 @@ public class SegurancaConfig {
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/h2-console/**").permitAll();
                     req.requestMatchers("/api/login").permitAll();
+                    req.requestMatchers(HttpMethod.GET, "/api/produtos/**").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/api/categorias").permitAll();
                     req.anyRequest().authenticated();

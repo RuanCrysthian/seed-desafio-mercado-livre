@@ -286,7 +286,7 @@ public class CadastroOpiniaoControllerTest extends TestApi {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens").isArray())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens[0]").value("Campo obrigatório."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens[0]").value("Título é obrigatório."));
     }
 
     @Test
