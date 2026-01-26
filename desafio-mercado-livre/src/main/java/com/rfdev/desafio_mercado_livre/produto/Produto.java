@@ -1,31 +1,17 @@
 package com.rfdev.desafio_mercado_livre.produto;
 
+import com.rfdev.desafio_mercado_livre.categoria.Categoria;
+import com.rfdev.desafio_mercado_livre.usuario.Usuario;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import com.rfdev.desafio_mercado_livre.categoria.Categoria;
-import com.rfdev.desafio_mercado_livre.usuario.Usuario;
-
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
 
 @Entity
 @Table(name = "produtos")
@@ -115,7 +101,7 @@ public class Produto {
         this.quantidadeDisponivel = this.quantidadeDisponivel.subtract(quantidade);
     }
 
-    private boolean possuiEstoque(@PositiveOrZero BigInteger quantidade) {
+    public boolean possuiEstoque(@PositiveOrZero BigInteger quantidade) {
         return this.quantidadeDisponivel.compareTo(quantidade) >= 0;
     }
 
