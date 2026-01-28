@@ -9,9 +9,9 @@ public class TradutorStatusPaypal implements TradutorStatusTransacao {
 
     @Override
     public PagamentoStatus traduzirStatus(Object statusTransacao) {
-        if (statusTransacao.equals("1")) {
+        if (statusTransacao.equals("1") || statusTransacao.equals(1)) {
             return PagamentoStatus.SUCESSO;
-        } else if (statusTransacao.equals("0")) {
+        } else if (statusTransacao.equals("0") || statusTransacao.equals(0)) {
             return PagamentoStatus.FALHA;
         }
         throw new IllegalArgumentException("Status de transação desconhecido: " + statusTransacao);

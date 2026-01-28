@@ -1,7 +1,7 @@
 package com.rfdev.desafio_mercado_livre.configuracao.utilitarios;
 
 import com.rfdev.desafio_mercado_livre.compra.TipoGatewayPagamento;
-import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.gatewaypagamento.TradutorStatusPagsecuro;
+import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.gatewaypagamento.TradutorStatusPagseguro;
 import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.gatewaypagamento.TradutorStatusPaypal;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ class TradutorStatusTransacaoFactoryTest {
 
         // Then
         assertNotNull(tradutor);
-        assertInstanceOf(TradutorStatusPagsecuro.class, tradutor);
+        assertInstanceOf(TradutorStatusPagseguro.class, tradutor);
     }
 
     @Test

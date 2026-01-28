@@ -5,7 +5,7 @@ import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.TradutorStatusTr
 import org.springframework.stereotype.Component;
 
 @Component
-public class TradutorStatusPagsecuro implements TradutorStatusTransacao {
+public class TradutorStatusPagseguro implements TradutorStatusTransacao {
 
     @Override
     public PagamentoStatus traduzirStatus(Object statusTransacao) {
