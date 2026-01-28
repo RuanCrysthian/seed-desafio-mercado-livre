@@ -2,12 +2,14 @@ package com.rfdev.desafio_mercado_livre.compra;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "transacoes_pagamento")
+@Getter
 public class TransacaoPagamento {
 
     @Id
@@ -54,31 +56,4 @@ public class TransacaoPagamento {
         this.dataCriacao = Instant.now();
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Compra getCompraOrigem() {
-        return compraOrigem;
-    }
-
-    public UUID getTransacaoGatewayId() {
-        return transacaoGatewayId;
-    }
-
-    public PagamentoStatus getStatus() {
-        return status;
-    }
-
-    public TipoGatewayPagamento getTipoGatewayPagamento() {
-        return tipoGatewayPagamento;
-    }
-
-    public Instant getDataCriacao() {
-        return dataCriacao;
-    }
-
-    public boolean pagamentoConcluidoComSucesso() {
-        return this.status == PagamentoStatus.SUCESSO;
-    }
 }
