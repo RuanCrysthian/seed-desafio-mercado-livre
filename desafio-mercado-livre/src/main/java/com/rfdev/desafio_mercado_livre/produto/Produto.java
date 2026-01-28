@@ -95,9 +95,6 @@ public class Produto {
         if (!possuiEstoque(quantidade)) {
             throw new IllegalArgumentException("Estoque insuficiente para abater a quantidade solicitada.");
         }
-        if (quantidade.compareTo(this.quantidadeDisponivel) > 0) {
-            throw new IllegalArgumentException("Quantidade a ser abatida é maior que o estoque disponível.");
-        }
         this.quantidadeDisponivel = this.quantidadeDisponivel.subtract(quantidade);
     }
 
