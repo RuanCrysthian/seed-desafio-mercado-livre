@@ -1,9 +1,11 @@
 package com.rfdev.desafio_mercado_livre.produto.imagem;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
+import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.ObjectStorage;
+import com.rfdev.desafio_mercado_livre.produto.Produto;
+import com.rfdev.desafio_mercado_livre.produto.ProdutoRepository;
+import com.rfdev.desafio_mercado_livre.produto.imagem.UploadImagemProdutoResponse.ImagemUploadada;
+import com.rfdev.desafio_mercado_livre.usuario.Usuario;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
@@ -16,13 +18,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.ObjectStorage;
-import com.rfdev.desafio_mercado_livre.produto.Produto;
-import com.rfdev.desafio_mercado_livre.produto.ProdutoRepository;
-import com.rfdev.desafio_mercado_livre.produto.imagem.UploadImagemProdutoResponse.ImagemUploadada;
-import com.rfdev.desafio_mercado_livre.usuario.Usuario;
-
-import jakarta.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @ConditionalOnProperty(name = "app.minio.enabled", havingValue = "true", matchIfMissing = true)
@@ -86,7 +84,6 @@ public class UploadImagemProdutoController {
 
                 String url = String.format("%s/%s/%s", minioUrl, bucketName, nomeArquivo);
 
-                produto.adicionarImagens(urlsImagens);
                 urlsImagens.add(url);
 
                 imagensUploadadas.add(new ImagemUploadada(
@@ -94,6 +91,7 @@ public class UploadImagemProdutoController {
                         nomeArquivo));
             }
 
+            produto.adicionarImagens(urlsImagens);
             produtoRepository.save(produto);
 
             UploadImagemProdutoResponse response = UploadImagemProdutoResponse.of(
