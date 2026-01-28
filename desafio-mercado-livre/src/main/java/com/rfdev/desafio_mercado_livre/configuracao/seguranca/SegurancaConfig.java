@@ -33,6 +33,9 @@ public class SegurancaConfig {
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers("/h2-console/**").permitAll();
                     req.requestMatchers("/api/login").permitAll();
+                    req.requestMatchers("/api/notas-fiscais/**").permitAll();
+                    req.requestMatchers("/api/ranking-vendedores/**").permitAll();
+                    req.requestMatchers("/retorno-pagamento-**").permitAll();
                     req.requestMatchers(HttpMethod.GET, "/api/produtos/**").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/api/categorias").permitAll();

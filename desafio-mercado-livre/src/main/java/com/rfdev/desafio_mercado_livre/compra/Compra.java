@@ -96,4 +96,12 @@ public class Compra {
     public CompraStatus getStatus() {
         return status;
     }
+
+    public boolean compraFoiConcluidaComSucesso() {
+        return this.status == CompraStatus.CONCLUIDA;
+    }
+
+    public void concluirCompra() {
+        this.status = CompraStatus.CONCLUIDA;
+    }
 }

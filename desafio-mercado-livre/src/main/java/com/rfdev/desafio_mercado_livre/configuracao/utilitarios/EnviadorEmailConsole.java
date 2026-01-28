@@ -25,6 +25,18 @@ public class EnviadorEmailConsole implements EnviadorEmail {
         System.out.println(corpoEmail);
     }
 
+    @Override
+    public void enviarEmailPagamentoFalhou(Compra compra) {
+        String corpoEmail = contruirCorpoEmailPagamentoFalhou(compra);
+        System.out.println(corpoEmail);
+    }
+
+    @Override
+    public void enviarEmailCompraConfirmada(Compra compra) {
+        String corpoEmail = contruirCorpoEmailCompraConfirmada(compra);
+        System.out.println(corpoEmail);
+    }
+
     private String construirCorpoEmail(Pergunta pergunta) {
         Produto produto = pergunta.getProduto();
         Usuario vendedor = produto.getUsuarioCriador();
@@ -77,6 +89,72 @@ public class EnviadorEmailConsole implements EnviadorEmail {
         email.append(QUEBRA_LINHA);
 
         email.append("Um comprador demonstrou interesse em adquirir o produto '").append(produto.getNome()).append("':")
+                .append(QUEBRA_LINHA);
+        email.append(QUEBRA_LINHA);
+
+        email.append("Comprador: ").append(comprador.getLogin()).append(QUEBRA_LINHA);
+        email.append("Quantidade: ").append(compra.getQuantidade()).append(QUEBRA_LINHA);
+        email.append("Gateway de Pagamento: ").append(compra.getTipoGatewayPagamento()).append(QUEBRA_LINHA);
+        email.append(QUEBRA_LINHA);
+
+        email.append("Link para visualização: api/produtos/").append(produto.getId()).append(QUEBRA_LINHA);
+        email.append(SEPARADOR_PRINCIPAL);
+
+        return email.toString();
+    }
+
+    private String contruirCorpoEmailPagamentoFalhou(Compra compra) {
+        Produto produto = compra.getProduto();
+        Usuario vendedor = produto.getUsuarioCriador();
+        Usuario comprador = compra.getComprador();
+
+        StringBuilder email = new StringBuilder();
+
+        email.append(SEPARADOR_PRINCIPAL).append(QUEBRA_LINHA);
+        email.append("NOVO EMAIL - PAGAMENTO FALHOU").append(QUEBRA_LINHA);
+        email.append(SEPARADOR_PRINCIPAL).append(QUEBRA_LINHA);
+
+        email.append("Para: ").append(vendedor.getLogin()).append(QUEBRA_LINHA);
+        email.append("Assunto: Falha no pagamento da compra do produto: ").append(produto.getNome()).append(QUEBRA_LINHA);
+
+        email.append(SEPARADOR_SECUNDARIO).append(QUEBRA_LINHA);
+        email.append("Olá,").append(QUEBRA_LINHA);
+        email.append(QUEBRA_LINHA);
+
+        email.append("Houve uma falha no pagamento da compra do produto '").append(produto.getNome()).append("':")
+                .append(QUEBRA_LINHA);
+        email.append(QUEBRA_LINHA);
+
+        email.append("Comprador: ").append(comprador.getLogin()).append(QUEBRA_LINHA);
+        email.append("Quantidade: ").append(compra.getQuantidade()).append(QUEBRA_LINHA);
+        email.append("Gateway de Pagamento: ").append(compra.getTipoGatewayPagamento()).append(QUEBRA_LINHA);
+        email.append(QUEBRA_LINHA);
+
+        email.append("Link para visualização: api/produtos/").append(produto.getId()).append(QUEBRA_LINHA);
+        email.append(SEPARADOR_PRINCIPAL);
+
+        return email.toString();
+    }
+
+    private String contruirCorpoEmailCompraConfirmada(Compra compra) {
+        Produto produto = compra.getProduto();
+        Usuario vendedor = produto.getUsuarioCriador();
+        Usuario comprador = compra.getComprador();
+
+        StringBuilder email = new StringBuilder();
+
+        email.append(SEPARADOR_PRINCIPAL).append(QUEBRA_LINHA);
+        email.append("NOVO EMAIL - COMPRA CONFIRMADA").append(QUEBRA_LINHA);
+        email.append(SEPARADOR_PRINCIPAL).append(QUEBRA_LINHA);
+
+        email.append("Para: ").append(vendedor.getLogin()).append(QUEBRA_LINHA);
+        email.append("Assunto: Compra confirmada do produto: ").append(produto.getNome()).append(QUEBRA_LINHA);
+
+        email.append(SEPARADOR_SECUNDARIO).append(QUEBRA_LINHA);
+        email.append("Olá,").append(QUEBRA_LINHA);
+        email.append(QUEBRA_LINHA);
+
+        email.append("A compra do produto '").append(produto.getNome()).append("' foi confirmada com sucesso:")
                 .append(QUEBRA_LINHA);
         email.append(QUEBRA_LINHA);
 

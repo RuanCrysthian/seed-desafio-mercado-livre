@@ -9,4 +9,8 @@ public interface EnviadorEmail {
 
     void enviarEmailDesejoCompra(Compra compra);
 
+    void enviarEmailPagamentoFalhou(Compra compra);
+
+    void enviarEmailCompraConfirmada(Compra compra);
+
 }
