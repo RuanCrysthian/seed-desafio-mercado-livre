@@ -4,4 +4,3 @@ Este é um repositório vazio de propósito. A ideia é que você faça um fork 
 
 Durante cada uma das seis semanas eu vou pegar código por amostragem e analisar. Feito isso, vou criar um vídeo anonimizando a pessoa que é dona do código, com as minhas observações e postar isso como material de suporte da funcionalidade :). 
 
-a
