@@ -1,9 +1,14 @@
 package com.rfdev.desafio_mercado_livre.compra.checkout;
 
-import com.rfdev.desafio_mercado_livre.TestApi;
-import com.rfdev.desafio_mercado_livre.categoria.Categoria;
-import com.rfdev.desafio_mercado_livre.produto.Produto;
-import com.rfdev.desafio_mercado_livre.usuario.Usuario;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +19,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.rfdev.desafio_mercado_livre.TestApi;
+import com.rfdev.desafio_mercado_livre.categoria.Categoria;
+import com.rfdev.desafio_mercado_livre.produto.Produto;
+import com.rfdev.desafio_mercado_livre.usuario.Usuario;
+
 import tools.jackson.databind.ObjectMapper;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 class CheckoutControllerTest extends TestApi {
 
@@ -58,14 +60,13 @@ class CheckoutControllerTest extends TestApi {
         CheckoutRequest request = new CheckoutRequest(
                 UUID.randomUUID(),
                 BigInteger.valueOf(1),
-                "PAYPAL"
-        );
+                "PAYPAL");
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/checkout")
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(comprador)))
-                                .contentType("application/json")
-                                .content(objectMapper.writeValueAsString(request)))
+                MockMvcRequestBuilders.post("/api/checkout")
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(comprador)))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens[0]").value("Produto não encontrado."));
@@ -104,17 +105,17 @@ class CheckoutControllerTest extends TestApi {
         CheckoutRequest request = new CheckoutRequest(
                 produto.getId(),
                 BigInteger.valueOf(10), // Quantidade maior que o estoque
-                "PAYPAL"
-        );
+                "PAYPAL");
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/checkout")
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(comprador)))
-                                .contentType("application/json")
-                                .content(objectMapper.writeValueAsString(request)))
+                MockMvcRequestBuilders.post("/api/checkout")
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(comprador)))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens").isArray())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens[0]").value("Estoque insuficiente para abater a quantidade solicitada."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.mensagens[0]")
+                        .value("Estoque insuficiente para abater a quantidade solicitada."));
     }
 
     @Test
@@ -150,17 +151,17 @@ class CheckoutControllerTest extends TestApi {
         CheckoutRequest request = new CheckoutRequest(
                 produto.getId(),
                 BigInteger.valueOf(2),
-                "PAYPAL"
-        );
+                "PAYPAL");
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/checkout")
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(comprador)))
-                                .contentType("application/json")
-                                .content(objectMapper.writeValueAsString(request)))
+                MockMvcRequestBuilders.post("/api/checkout")
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(comprador)))
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(MockMvcResultMatchers.status().isFound())
                 .andExpect(MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("paypal.com/")))
-                .andExpect(MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("redirectUrl=")));
+                .andExpect(
+                        MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("redirectUrl=")));
 
         entityManager.flush();
         entityManager.clear();

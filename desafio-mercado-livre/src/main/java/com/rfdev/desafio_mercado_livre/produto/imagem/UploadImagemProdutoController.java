@@ -1,6 +1,5 @@
 package com.rfdev.desafio_mercado_livre.produto.imagem;
 
-import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.ObjectStorage;
 import com.rfdev.desafio_mercado_livre.produto.Produto;
 import com.rfdev.desafio_mercado_livre.produto.ProdutoRepository;
 import com.rfdev.desafio_mercado_livre.produto.imagem.UploadImagemProdutoResponse.ImagemUploadada;
@@ -21,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @ConditionalOnProperty(name = "app.minio.enabled", havingValue = "true", matchIfMissing = true)
@@ -33,13 +33,13 @@ public class UploadImagemProdutoController {
     private String bucketName;
 
     private final ProdutoRepository produtoRepository;
-    private final ObjectStorage objectStorage;
+    private final AsyncStorageService asyncStorageService;
 
     public UploadImagemProdutoController(
             ProdutoRepository produtoRepository,
-            ObjectStorage objectStorage) {
+            AsyncStorageService asyncStorageService) {
         this.produtoRepository = produtoRepository;
-        this.objectStorage = objectStorage;
+        this.asyncStorageService = asyncStorageService;
     }
 
     @PostMapping("/api/produtos/{id}/imagens")
@@ -70,39 +70,45 @@ public class UploadImagemProdutoController {
         }
 
         try {
-            List<ImagemUploadada> imagensUploadadas = new ArrayList<>();
-            List<String> urlsImagens = new ArrayList<>();
+            // Lê os bytes de todos os arquivos antes de disparar os uploads em paralelo
+            List<CompletableFuture<String>> futures = new ArrayList<>();
+            List<String> nomesOriginais = new ArrayList<>();
 
             for (MultipartFile arquivo : imagens) {
                 if (arquivo.isEmpty()) {
                     continue;
                 }
-
-                String nomeArquivo = objectStorage.armazenar(
+                nomesOriginais.add(arquivo.getOriginalFilename());
+                futures.add(asyncStorageService.armazenarAsync(
                         arquivo.getOriginalFilename(),
-                        arquivo.getInputStream());
+                        arquivo.getBytes()));
+            }
 
-                String url = String.format("%s/%s/%s", minioUrl, bucketName, nomeArquivo);
+            // Aguarda todos os uploads terminarem em paralelo
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
+            List<String> urlsImagens = new ArrayList<>();
+            List<ImagemUploadada> imagensUploadadas = new ArrayList<>();
+
+            for (int i = 0; i < futures.size(); i++) {
+                String nomeUnico = futures.get(i).get();
+                String url = String.format("%s/%s/%s", minioUrl, bucketName, nomeUnico);
                 urlsImagens.add(url);
-
-                imagensUploadadas.add(new ImagemUploadada(
-                        url,
-                        nomeArquivo));
+                imagensUploadadas.add(new ImagemUploadada(url, nomeUnico));
             }
 
             produto.adicionarImagens(urlsImagens);
             produtoRepository.save(produto);
 
-            UploadImagemProdutoResponse response = UploadImagemProdutoResponse.of(
-                    produto.getId(),
-                    imagensUploadadas);
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(UploadImagemProdutoResponse.of(produto.getId(), imagensUploadadas));
 
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof IllegalArgumentException iae) {
+                throw iae;
+            }
             throw new RuntimeException("Erro ao fazer upload das imagens: " + e.getMessage());
         }
     }

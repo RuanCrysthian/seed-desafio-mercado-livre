@@ -1,14 +1,17 @@
 package com.rfdev.desafio_mercado_livre.compra.processar;
 
 import com.rfdev.desafio_mercado_livre.compra.*;
-import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.EnviadorEmail;
+import com.rfdev.desafio_mercado_livre.configuracao.mensageria.RabbitMQConfig;
+import com.rfdev.desafio_mercado_livre.configuracao.mensageria.eventos.EventoPagamentoConfirmado;
+import com.rfdev.desafio_mercado_livre.configuracao.mensageria.eventos.EventoPagamentoFalhou;
 import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.TradutorStatusTransacao;
 import com.rfdev.desafio_mercado_livre.configuracao.utilitarios.TradutorStatusTransacaoFactory;
-import com.rfdev.desafio_mercado_livre.notafiscal.NotaFiscalService;
-import com.rfdev.desafio_mercado_livre.vendedores.RankingVendedoresService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.UUID;
 
@@ -17,21 +20,15 @@ public class ProcessadorPagamentoService {
 
     private final TransacaoPagamentoRepository transacaoRepository;
     private final CompraRepository compraRepository;
-    private final NotaFiscalService notaFiscalService;
-    private final EnviadorEmail enviadorEmail;
-    private final RankingVendedoresService rankingService;
+    private final RabbitTemplate rabbitTemplate;
 
     public ProcessadorPagamentoService(
             TransacaoPagamentoRepository transacaoRepository,
             CompraRepository compraRepository,
-            NotaFiscalService notaFiscalService,
-            EnviadorEmail enviadorEmail,
-            RankingVendedoresService rankingService) {
+            RabbitTemplate rabbitTemplate) {
         this.transacaoRepository = transacaoRepository;
         this.compraRepository = compraRepository;
-        this.notaFiscalService = notaFiscalService;
-        this.enviadorEmail = enviadorEmail;
-        this.rankingService = rankingService;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Transactional
@@ -81,16 +78,32 @@ public class ProcessadorPagamentoService {
     }
 
     private void processarFalha(Compra compra) {
-        enviadorEmail.enviarEmailPagamentoFalhou(compra);
+        UUID compraId = compra.getId();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                rabbitTemplate.convertAndSend(
+                        RabbitMQConfig.EXCHANGE,
+                        RabbitMQConfig.RK_PAGAMENTO_FALHOU,
+                        new EventoPagamentoFalhou(compraId));
+            }
+        });
     }
 
     private void processarSucesso(Compra compra) {
         compra.concluirCompra();
         compraRepository.save(compra);
 
-        notaFiscalService.notificarCompraConcluida(compra);
-        rankingService.notificarVenda(compra);
-        enviadorEmail.enviarEmailCompraConfirmada(compra);
+        UUID compraId = compra.getId();
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                rabbitTemplate.convertAndSend(
+                        RabbitMQConfig.EXCHANGE,
+                        RabbitMQConfig.RK_PAGAMENTO_CONFIRMADO,
+                        new EventoPagamentoConfirmado(compraId));
+            }
+        });
     }
 
 }

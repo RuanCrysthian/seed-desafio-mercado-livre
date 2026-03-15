@@ -1,13 +1,14 @@
 package com.rfdev.desafio_mercado_livre.produto.imagem;
 
-import com.rfdev.desafio_mercado_livre.TestApi;
-import com.rfdev.desafio_mercado_livre.categoria.Categoria;
-import com.rfdev.desafio_mercado_livre.produto.Produto;
-import com.rfdev.desafio_mercado_livre.produto.ProdutoRepository;
-import com.rfdev.desafio_mercado_livre.usuario.Usuario;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,12 +27,15 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.MinIOContainer;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
+import com.rfdev.desafio_mercado_livre.TestApi;
+import com.rfdev.desafio_mercado_livre.categoria.Categoria;
+import com.rfdev.desafio_mercado_livre.produto.Produto;
+import com.rfdev.desafio_mercado_livre.produto.ProdutoRepository;
+import com.rfdev.desafio_mercado_livre.usuario.Usuario;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
 
 class UploadImagemProdutoControllerTest extends TestApi {
 
@@ -136,14 +140,14 @@ class UploadImagemProdutoControllerTest extends TestApi {
                 "conteudo da imagem 2".getBytes());
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
-                                .file(imagem1)
-                                .file(imagem2)
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
+                        .file(imagem1)
+                        .file(imagem2)
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.produtoId").value(produto.getId().toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.imagens").isArray())
@@ -177,13 +181,13 @@ class UploadImagemProdutoControllerTest extends TestApi {
                 "conteudo da imagem".getBytes());
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", "550e8400-e29b-41d4-a716-446655440000")
-                                .file(imagem)
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", "550e8400-e29b-41d4-a716-446655440000")
+                        .file(imagem)
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
@@ -223,13 +227,13 @@ class UploadImagemProdutoControllerTest extends TestApi {
                 "conteudo da imagem".getBytes());
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
-                                .file(imagem)
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(outroVendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
+                        .file(imagem)
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(outroVendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 
@@ -258,12 +262,12 @@ class UploadImagemProdutoControllerTest extends TestApi {
         entityManager.flush();
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -299,13 +303,13 @@ class UploadImagemProdutoControllerTest extends TestApi {
                 new byte[0]);
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
-                                .file(imagemVazia)
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
+                        .file(imagemVazia)
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -345,12 +349,12 @@ class UploadImagemProdutoControllerTest extends TestApi {
         }
 
         mockMvc.perform(
-                        multipartRequest
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                multipartRequest
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -386,13 +390,13 @@ class UploadImagemProdutoControllerTest extends TestApi {
                 "conteudo do pdf".getBytes());
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
-                                .file(arquivoPdf)
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
+                        .file(arquivoPdf)
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
@@ -430,13 +434,13 @@ class UploadImagemProdutoControllerTest extends TestApi {
 
         try {
             mockMvc.perform(
-                            MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
-                                    .file(imagemGrande)
-                                    .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                    .with(request -> {
-                                        request.setMethod("POST");
-                                        return request;
-                                    }))
+                    MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
+                            .file(imagemGrande)
+                            .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                            .with(request -> {
+                                request.setMethod("POST");
+                                return request;
+                            }))
                     .andExpect(MockMvcResultMatchers.status().is5xxServerError());
         } catch (Exception e) {
             // O erro pode ser lançado como ServletException quando o arquivo é muito grande
@@ -490,15 +494,15 @@ class UploadImagemProdutoControllerTest extends TestApi {
                 "conteudo gif".getBytes());
 
         mockMvc.perform(
-                        MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
-                                .file(imagemJpg)
-                                .file(imagemPng)
-                                .file(imagemGif)
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                MockMvcRequestBuilders.multipart("/api/produtos/{id}/imagens", produto.getId())
+                        .file(imagemJpg)
+                        .file(imagemPng)
+                        .file(imagemGif)
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.imagens.length()").value(3));
 
@@ -546,12 +550,12 @@ class UploadImagemProdutoControllerTest extends TestApi {
         }
 
         mockMvc.perform(
-                        multipartRequest
-                                .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
-                                .with(request -> {
-                                    request.setMethod("POST");
-                                    return request;
-                                }))
+                multipartRequest
+                        .with(SecurityMockMvcRequestPostProcessors.authentication(createAuthentication(vendedor)))
+                        .with(request -> {
+                            request.setMethod("POST");
+                            return request;
+                        }))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.imagens.length()").value(10));
 
